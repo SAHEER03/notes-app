@@ -1,32 +1,36 @@
-// import jsonwebtoken library to verify token
 const jwt = require("jsonwebtoken");
 
-// export middleware function to verify JWT token and authenticate user
 module.exports = (req, res, next) => {
 
-    // get token from Authorization header
-    const token = req.header.authorization?.split(" ")[1];
+    // read authorization header
+    const authHeader = req.headers.authorization;
 
-    // if token is not provided, user is not aauthenticated
+    if (!authHeader) {
+        return res.status(401).json({ message: "No token provided" });
+    }
+
+    // remove Bearer from header
+    const token = authHeader.split(" ")[1];
+
     if (!token) {
-        return res.status(401).json({ message: "No token, authorization denied" });
+        return res.status(401).json({ message: "Token missing" });
     }
 
     try {
 
-        // verify the token using the secret key from .env variables
+        // verify token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // store decoded user information in request object for use in other routes
+        // attach user to request
         req.user = decoded;
 
-        // call next middleware or route handler
         next();
 
     } catch (error) {
 
-        // if token verification failes return unauthorized error messasge
-        res.status(401).json({ message: "Invalid token" });
+        console.log("JWT VERIFY ERROR:", error.message);
+
+        return res.status(401).json({ message: "Invalid token" });
+
     }
-}
-    
+};

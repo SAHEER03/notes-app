@@ -102,3 +102,15 @@ exports.login = async (req, res) => {
     }
 
 };
+
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Logout function to clear user session (if needed)
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+exports.logout = (req, res) => {
+
+    res.json({
+        message: "Logged out successfully"
+    });
+
+};

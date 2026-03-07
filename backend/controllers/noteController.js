@@ -15,11 +15,16 @@ exports.createNote = async (req, res) => {
         // get title and content from request body (sent from frontend)
         const { title, content } = req.body;
 
+        // check if user exists in request (set by auth middleware)
+        if (!req.user) {
+            return res.status(401).json({ message: "User not authenticated" });
+        }
+
         // Create a new note object from authenticated user
         const note = new Note({
         title,
         content,
-        owner: req.user.id
+        owner: req.user.id || req.user._id
         });
 
         // save to database
@@ -48,8 +53,7 @@ exports.getNotes = async (req, res) => {
             { owner: req.user.id },
             { collaborators: req.user.id }
         ]
-        });
-
+        }).populate("collaborators", "name email");
         // return the list of notes
         res.json(notes);
 
